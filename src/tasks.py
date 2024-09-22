@@ -9,8 +9,8 @@ class PyTask:
     def __init__(self, task_function: callable, max_retries: int = 0):
         self._max_retries = max_retries
         self._task_function = task_function
-        self.previous = None
-        self.next = None
+        self.previous = []
+        self.next = []
         self.hash = hash(self._task_function)
 
     def __repr__(self):
@@ -23,4 +23,11 @@ class PyTask:
         return self._task_function(**function_args)
 
     def __rshift__(self, other: "PyTask"):
-        self.next = other
+        self.next.append(other)
+        other.previous.append(self)
+        return other
+
+    def __lshift__(self, other: "PyTask"):
+        raise NotImplementedError(
+            "Cannot use the left shift operator on the first task in the chain."
+        )
